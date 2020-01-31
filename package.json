@@ -1,0 +1,10 @@
+{
+  "name": "docker-multiple-containers",
+  "version": "1.0.0",
+  "description": "Learn docker multi container system",
+  "main": "index.js",
+  "repository": "https://github.com/MechoshiPuhanaga/docker-multiple-containers.git",
+  "author": "Mechoshi Puhanaga <mechokio@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
