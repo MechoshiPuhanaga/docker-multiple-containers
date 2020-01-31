@@ -1,10 +1,13 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
+let timeoutId = null;
+
 const Fib = props => {
   const [seenIndexes, setSeenIndexes] = useState([]);
   const [values, setValues] = useState({});
   const [index, setIndex] = useState("");
+  const [refreshFlag, setRefreshFlag] = useState({});
 
   const fetchValues = useCallback(async () => {
     try {
@@ -24,22 +27,19 @@ const Fib = props => {
     }
   }, []);
 
-  const renderValues = useCallback(
-    () => {
-      const entries = [];
+  const renderValues = useCallback(() => {
+    const entries = [];
 
-      for (let key in values) {
-        entries.push(
-          <div key={key}>
-            For index {key} I calculated {values[key]}
-          </div>
-        );
-      }
+    for (let key in values) {
+      entries.push(
+        <div key={key}>
+          For index {key} I calculated {values[key]}
+        </div>
+      );
+    }
 
-      return entries;
-    },
-    [values]
-  );
+    return entries;
+  }, [values]);
 
   const handleSubmit = useCallback(
     async event => {
@@ -47,6 +47,7 @@ const Fib = props => {
 
       if (isNaN(index) || parseInt(index) > 40) {
         console.log(`Index is not a valid number larger than 40: ${index}`);
+        setIndex("");
         return;
       }
 
@@ -55,6 +56,11 @@ const Fib = props => {
           index
         });
         setIndex("");
+
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          setRefreshFlag({});
+        }, 3000);
       } catch (error) {
         console.error(error);
       }
@@ -62,10 +68,10 @@ const Fib = props => {
     [index]
   );
 
-  useEffect(async () => {
+  useEffect(() => {
     fetchValues();
     fetchIndexes();
-  }, []);
+  }, [fetchIndexes, fetchValues, refreshFlag]);
 
   return (
     <div>
@@ -74,7 +80,7 @@ const Fib = props => {
         <input
           id="index-input"
           value={index}
-          onChage={event => {
+          onChange={event => {
             setIndex(event.target.value);
           }}
         />
