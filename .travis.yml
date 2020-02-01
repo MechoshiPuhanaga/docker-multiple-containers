@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before-install:
+  - docker build -t mechoshipuhanaga/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true mechoshipuhanaga/react-test yarn test
+
+after_success:
+  - docker build -t mechoshipuhanaga/multi-client ./client
+  - docker build -t mechoshipuhanaga/multi-nginx ./nginx
+  - docker build -t mechoshipuhanaga/multi-server ./server
+  - docker build -t mechoshipuhanaga/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push mechoshipuhanaga/multi-client
+  - docker push mechoshipuhanaga/multi-nginx
+  - docker push mechoshipuhanaga/multi-server
+  - docker push mechoshipuhanaga/multi-worker
